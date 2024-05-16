@@ -85,8 +85,7 @@ app.get('/getWatchlists/:userId',async (req,res)=>{
 
 //  getting all information about stock using their stock symbol
 app.get('/GettingStocksData/:SymbolName', (req, res) => {
-
-    var url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${req.params.SymbolName}&apikey=demo`;
+    var url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${req.params.SymbolName}&apikey=R0DRYH92UBISDSUS`;
     request.get({
         url: url,
         json: true,
@@ -156,9 +155,9 @@ app.post("/addItemToInnerArray/:userId/:innerArrayId", async (req, res) => {
     try {
         const userId = req.params.userId;
         const innerArrayId = req.params.innerArrayId;
-        const dataToAdd = req.body;
+        const dataToAdd = req.body.dataToAdd; 
 
-        const user = await UserSchema.findById(userId);
+        const user = await Users.findById(userId);
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
@@ -166,6 +165,12 @@ app.post("/addItemToInnerArray/:userId/:innerArrayId", async (req, res) => {
         const innerArrayItem = user.WatchListCreate.id(innerArrayId);
         if (!innerArrayItem) {
             return res.status(404).json({ error: "Inner array item not found" });
+        }
+
+       
+        const existingItem = innerArrayItem.items.find(item => item.Symbol === dataToAdd.Symbol);
+        if (existingItem) {
+            return res.status(400).json({ error: "Item with the same Symbol already exists in the inner array" });
         }
 
         const itemToAdd = { id: uuid, ...dataToAdd };
@@ -300,29 +305,25 @@ app.delete('/deleteWatchlist/:userId/:watchlistName', async (req, res) => {
   });
 // LOgin API
 app.post("/login", async (req, res) => {
-    let CUsername = req.body.username;
-    let user = await Users.findOne({ username: CUsername });
-    if (user) {
-        let CPassword = req.body.password;
-        let SPassword = user.password
-
-        const UserId = {
-            user: {
-                id: user._id
-            }
-        }
-
-        if (CPassword === SPassword) {
-            res.status(200).send("Your Logged Successfullt" + user)
-
-        } else {
-            res.status(409).send("enter valid Password")
-        }
+    const { email, password } = req.body;
+  
+    try {
+      const user = await UserSchema.findOne({ email });
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      if (password !== user.password) {
+        return res.status(401).json({ message: "Invalid password" });
+      }
+  
+      res.status(200).json({ message: "Login successful", user });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Internal server error" });
     }
-    else {
-        res.status(404).send("User Not Found");
-    }
-});
+  });
 
 
 // Password Change
@@ -340,13 +341,21 @@ app.put("/changePswrd/:Id", async (req, res) => {
 // Serach Api
 app.get('/search', async (req, res) => {
     try {
-        const searchQuery = req.query.q;
+        let searchQuery = req.query.q;
 
-        const results = await UserSchema.find({
+        // If no search query is provided, return all documents
+        if (!searchQuery) {
+            const allResults = await CardData.find();
+            return res.json(allResults);
+        }
+
+        // Perform the search with case-insensitive regex
+        const results = await CardData.find({
             $or: [
                 { CompanyName: { $regex: searchQuery, $options: 'i' } },
                 { Information: { $regex: searchQuery, $options: 'i' } },
-                { Symbol: { $regex: searchQuery, $options: 'i' } }            ]
+                { Symbol: { $regex: searchQuery, $options: 'i' } }
+            ]
         });
 
         res.json(results);
@@ -355,7 +364,6 @@ app.get('/search', async (req, res) => {
         res.status(500).json({ message: 'Internal server error' });
     }
 });
-
 
 app.get('/' , (req, res)=>{
     console.log("welcom to trading");
