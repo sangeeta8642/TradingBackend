@@ -1,0 +1,8 @@
+{
+    "CompanyInformation": "Intraday (5min) open, high, low, close prices and volume",
+    "CompanySymbol": "IBM",
+    "CompanyLastRefreshed": "2024-05-10 19:50:00",
+    "CompanyInterval": "5min",
+    "CompanyOutputSize": "Compact",
+    "CompanyTimeZone": "US/Eastern"
+}
