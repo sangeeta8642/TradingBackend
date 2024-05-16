@@ -356,6 +356,12 @@ app.get('/search', async (req, res) => {
     }
 });
 
+
+app.get('/' , (req, res)=>{
+    console.log("welcom to trading");
+    res.status(200).json("Welcome to trading")
+})
+
 // Server Listten port
 app.listen(5000, () => {
     console.log(`Server is running on port 5000`);
