@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
-mongoose.connect("mongodb://127.0.0.1:27017/TradingStocks")
+// mongoose.connect("mongodb://127.0.0.1:27017/TradingStocks")
+mongoose.connect("mongodb+srv://sangeetaperagani8642:WPYL9BqV32VDDeXm@clusters.vna7u5e.mongodb.net/TradingStocks?retryWrites=true&w=majority&appName=ClusterS")
 
 const db = mongoose.connection;
 
