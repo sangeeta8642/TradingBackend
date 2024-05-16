@@ -155,9 +155,9 @@ app.post("/addItemToInnerArray/:userId/:innerArrayId", async (req, res) => {
     try {
         const userId = req.params.userId;
         const innerArrayId = req.params.innerArrayId;
-        const dataToAdd = req.body.dataToAdd; 
+        const dataToAdd = req.body;
 
-        const user = await Users.findById(userId);
+        const user = await UserSchema.findById(userId);
         if (!user) {
             return res.status(404).json({ error: "User not found" });
         }
@@ -165,12 +165,6 @@ app.post("/addItemToInnerArray/:userId/:innerArrayId", async (req, res) => {
         const innerArrayItem = user.WatchListCreate.id(innerArrayId);
         if (!innerArrayItem) {
             return res.status(404).json({ error: "Inner array item not found" });
-        }
-
-       
-        const existingItem = innerArrayItem.items.find(item => item.Symbol === dataToAdd.Symbol);
-        if (existingItem) {
-            return res.status(400).json({ error: "Item with the same Symbol already exists in the inner array" });
         }
 
         const itemToAdd = { id: uuid, ...dataToAdd };
@@ -184,7 +178,6 @@ app.post("/addItemToInnerArray/:userId/:innerArrayId", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
-
 
 // Particular Data Delete 
 app.delete('/removeItem/:userId/:watchlistname/:itemsymbol', async (req, res) => {
