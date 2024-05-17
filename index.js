@@ -85,7 +85,7 @@ app.get('/getWatchlists/:userId',async (req,res)=>{
 
 //  getting all information about stock using their stock symbol
 app.get('/GettingStocksData/:SymbolName', (req, res) => {
-    var url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${req.params.SymbolName}&apikey=R0DRYH92UBISDSUS`;
+    var url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${req.params.SymbolName}&apikey=QVG07EJHPZHIAZ0M`;
     request.get({
         url: url,
         json: true,
